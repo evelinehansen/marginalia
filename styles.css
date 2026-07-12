@@ -122,7 +122,7 @@ main {
 
 .passage {
   font-family: var(--serif);
-  font-size: clamp(1.3rem, 4vw, 1.65rem);
+  font-size: clamp(1.2rem, 3.5vw, 1.45rem);
   line-height: 1.45;
   white-space: pre-line;
   margin-bottom: 1.25rem;
@@ -242,6 +242,8 @@ input[type="search"] {
   cursor: pointer;
   text-align: left;
   font: inherit;
+  /* buttons must set color explicitly: iOS Safari paints button text blue otherwise */
+  color: var(--ink);
   width: 100%;
   transition: border-color 0.2s, box-shadow 0.25s;
 }
@@ -251,6 +253,7 @@ input[type="search"] {
   font-family: var(--serif);
   font-size: 1rem;
   line-height: 1.4;
+  color: var(--sage-deep);
   margin-bottom: 0.4rem;
 }
 
@@ -427,9 +430,8 @@ input:focus, textarea:focus, select:focus {
 }
 
 @media (max-width: 480px) {
-  .wordmark { flex-basis: 100%; text-align: center; }
-  .tabs { margin: 0 auto; }
-  .top .btn.primary { margin: 0 auto; }
+  .wordmark { flex-basis: 100%; }
+  .tabs { margin-right: auto; }
 }
 
 /* ---- Reduced motion: crossfade, never movement ---- */
