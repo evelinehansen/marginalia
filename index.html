@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Keep the passages that struck you while reading, and meet one again each day. Local and private: nothing leaves your browser.">
+  <title>Marginalia</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="top">
+    <div class="wordmark">Marginalia</div>
+    <nav class="tabs" aria-label="Views">
+      <button class="tab" id="tab-today" data-view="today" aria-current="page">Today</button>
+      <button class="tab" id="tab-library" data-view="library">Library</button>
+    </nav>
+    <button class="btn primary" id="btn-capture">Save a passage</button>
+  </header>
+
+  <main>
+
+    <!-- Today: the daily card -->
+    <section id="view-today" aria-label="Today">
+      <div id="today-intro" hidden>
+        <p>Save what strikes you as you read.</p>
+        <p>Meet one passage here each day.</p>
+        <p>Keep what still hits, retire the rest with thanks.</p>
+      </div>
+      <div id="today-cards"></div>
+      <div id="today-actions"></div>
+      <p id="today-stats" class="stats-line"></p>
+      <div id="today-empty" class="empty-state" hidden>
+        <p>Save what strikes you as you read.</p>
+        <p>Meet one passage here each day.</p>
+        <p>Keep what still hits, retire the rest with thanks.</p>
+        <button class="btn primary" id="btn-empty-capture">Save your first passage</button>
+      </div>
+    </section>
+
+    <!-- Library: every entry -->
+    <section id="view-library" aria-label="Library" hidden>
+      <div class="library-controls">
+        <input type="search" id="lib-search" placeholder="Search passages, sources, authors" aria-label="Search the library">
+        <div class="chip-row" role="group" aria-label="Status filter">
+          <button class="chip selected" data-status="all">All</button>
+          <button class="chip" data-status="circulating">Circulating</button>
+          <button class="chip" data-status="retired">Retired</button>
+        </div>
+        <div class="select-row">
+          <select id="lib-source" aria-label="Filter by source"></select>
+          <select id="lib-tag" aria-label="Filter by tag"></select>
+        </div>
+      </div>
+      <p id="lib-heading" class="stats-line"></p>
+      <div id="lib-list"></div>
+    </section>
+
+  </main>
+
+  <footer class="data-bar">
+    <span id="backup-age">Last backup: never.</span>
+    <span class="data-actions">
+      <button class="btn ghost small" id="btn-export">Export library</button>
+      <button class="btn ghost small" id="btn-import">Import</button>
+      <input type="file" id="import-file" accept=".json,application/json" hidden>
+    </span>
+    <span class="data-note">Everything stays in this browser. The export file is the real home of your library.</span>
+  </footer>
+
+  <!-- Capture / edit panel: side panel on desktop, bottom sheet on mobile -->
+  <div class="backdrop" id="panel-backdrop" hidden></div>
+  <aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+    <div class="panel-head">
+      <h2 id="panel-title">Save a passage</h2>
+      <button class="btn ghost small" id="btn-panel-close" aria-label="Close">Close</button>
+    </div>
+    <form id="entry-form">
+      <label class="field">
+        <span class="field-label">Passage</span>
+        <textarea id="f-text" rows="5" placeholder="The passage itself" required></textarea>
+        <span class="field-note" id="length-nudge" hidden>That is a long one (over 1000 characters). Passages work best at quotation scale.</span>
+      </label>
+      <label class="field">
+        <span class="field-label">Source</span>
+        <input type="text" id="f-source" list="dl-sources" placeholder="Where it is from (book, essay, talk)" autocomplete="off">
+        <datalist id="dl-sources"></datalist>
+      </label>
+      <label class="field">
+        <span class="field-label">Author</span>
+        <input type="text" id="f-author" list="dl-authors" placeholder="Who wrote this?" autocomplete="off">
+        <datalist id="dl-authors"></datalist>
+      </label>
+      <label class="field">
+        <span class="field-label">Location</span>
+        <input type="text" id="f-location" placeholder="p. 133, ch. 4, or a link" autocomplete="off">
+      </label>
+      <label class="field">
+        <span class="field-label">Tags</span>
+        <input type="text" id="f-tags" placeholder="Separated by commas" autocomplete="off">
+      </label>
+      <label class="field">
+        <span class="field-label">Your thought</span>
+        <textarea id="f-thought" rows="2" placeholder="Why it struck you (just for you)"></textarea>
+      </label>
+      <div class="panel-actions">
+        <button type="submit" class="btn primary" id="btn-save-entry">Save passage</button>
+        <button type="button" class="btn ghost" id="btn-toggle-status" hidden>Retire</button>
+        <button type="button" class="btn danger" id="btn-delete" hidden>Delete</button>
+      </div>
+    </form>
+  </aside>
+
+  <!-- Delete confirmation -->
+  <div class="backdrop" id="modal-backdrop" hidden></div>
+  <div class="modal" id="modal-delete" role="dialog" aria-modal="true" hidden>
+    <p>Delete this passage? This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn" id="btn-delete-cancel">Cancel</button>
+      <button class="btn danger" id="btn-delete-confirm">Delete</button>
+    </div>
+  </div>
+
+  <!-- Import choice -->
+  <div class="modal" id="modal-import" role="dialog" aria-modal="true" hidden>
+    <p id="import-summary"></p>
+    <p class="modal-note">Merge adds the file's passages to your library. Replace starts over from the file.</p>
+    <div class="modal-actions">
+      <button class="btn" id="btn-import-cancel">Cancel</button>
+      <button class="btn" id="btn-import-replace">Replace</button>
+      <button class="btn primary" id="btn-import-merge">Merge</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden>
+    <span id="toast-text"></span>
+    <button class="btn ghost small" id="toast-action" hidden></button>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
